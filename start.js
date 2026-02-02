@@ -11,14 +11,35 @@
 // drawStart() is called from main.js only when:
 // currentScreen === "start"
 function drawStart() {
-  // Background colour for the start screen
-  background(180, 225, 220); // soft teal background
+  background(60, 160, 75); // grass green
+
+  push(); // isolate styles
+  stroke(255);
+  strokeWeight(4);
+  noFill();
+
+  // Outer boundary
+  rect(0, 0, width, height);
+
+  // Center line
+  line(-10, height / 2, width + 10, height / 2);
+  line(width / 2, -10, width / 2, height + 10);
+
+  // Center circle
+  ellipse(width / 2, height / 2, 180);
+
+  // Center spot
+  fill(255);
+  noStroke();
+  ellipse(width / 2, height / 2, 8);
+  pop();
 
   // ---- Title text ----
-  fill(30, 50, 60);
-  textSize(46);
+  fill(10, 70, 25);
   textAlign(CENTER, CENTER);
-  text("Win or Lose", width / 2, 180);
+  textFont("OpenSans");
+  textSize(100);
+  text("Kick it", width / 2, 180);
 
   // ---- Buttons (data only) ----
   // These objects store the position/size/label for each button.
@@ -26,7 +47,7 @@ function drawStart() {
   // and also reuse the same information for hover checks.
   const startBtn = {
     x: width / 2,
-    y: 320,
+    y: 330,
     w: 240,
     h: 80,
     label: "START",
@@ -34,7 +55,7 @@ function drawStart() {
 
   const instrBtn = {
     x: width / 2,
-    y: 430,
+    y: 470,
     w: 240,
     h: 80,
     label: "INSTRUCTIONS",
@@ -62,6 +83,7 @@ function startMousePressed() {
 
   // If START is clicked, go to the game screen
   if (isHover(startBtn)) {
+    initGame(); // 👈 ADD THIS LINE
     currentScreen = "game";
   }
   // If INSTRUCTIONS is clicked, go to the instructions screen

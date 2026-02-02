@@ -12,13 +12,28 @@
 // only when currentScreen === "instr"
 function drawInstr() {
   // Light neutral background
-  background(240);
+  background(60, 160, 75); // grass green
 
-  // ---- Screen title ----
-  fill(0);
-  textAlign(CENTER, TOP);
-  textSize(36);
-  text("Instructions", width / 2, 80);
+  push(); // isolate styles
+  stroke(255);
+  strokeWeight(4);
+  noFill();
+
+  // Outer boundary
+  rect(0, 0, width, height);
+
+  // Center line
+  line(-10, height / 2, width + 10, height / 2);
+  line(width / 2, -10, width / 2, height + 10);
+
+  // Center circle
+  ellipse(width / 2, height / 2, 180);
+
+  // Center spot
+  fill(255);
+  noStroke();
+  ellipse(width / 2, height / 2, 8);
+  pop();
 
   // ---- Instruction text ----
   textSize(18);
@@ -26,7 +41,8 @@ function drawInstr() {
   // \n creates a line break in the text
   // This is useful for simple multi-line instructions
   const lines =
-    "Press the game button.\n" + "You have a chance to win or lose!";
+    "Use the arrow keys to move the ball into the net\n" +
+    "Avoid the objects coming toward you. Score goals to win";
 
   text(lines, width / 2, 160);
 

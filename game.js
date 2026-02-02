@@ -12,6 +12,16 @@
 // and interact with the button on the game screen.
 // Keeping this in one object makes it easier to move,
 // resize, or restyle the button later.
+let ballX;
+let ballY;
+let ballSize = 30;
+let ballSpeed = 4;
+
+function initGame() {
+  ballX = width / 2;
+  ballY = height - 120;
+}
+
 const gameBtn = {
   x: 400, // x position (centre of the button)
   y: 550, // y position (centre of the button)
@@ -26,31 +36,49 @@ const gameBtn = {
 // drawGame() is called from main.js *only*
 // when currentScreen === "game"
 function drawGame() {
-  // Set background colour for the game screen
-  background(240, 230, 140);
+  // --- Soccer field background ---
+  background(60, 160, 75);
 
-  // ---- Title and instructions text ----
-  fill(0); // black text
-  textSize(32);
-  textAlign(CENTER, CENTER);
-  text("Game Screen", width / 2, 160);
+  // Midfield lines
+  stroke(255);
+  strokeWeight(6);
+  line(-10, height / 2, width + 10, height / 2); // horizontal
+  line(width / 2, -10, width / 2, height + 10); // vertical
+  noStroke();
 
-  textSize(18);
-  text(
-    "Click the button (or press ENTER) for a random result.",
-    width / 2,
-    210,
-  );
+  // --- Ball movement (player control) ---
+  if (keyIsDown(LEFT_ARROW)) ballX -= ballSpeed;
+  if (keyIsDown(RIGHT_ARROW)) ballX += ballSpeed;
+  if (keyIsDown(UP_ARROW)) ballY -= ballSpeed;
+  if (keyIsDown(DOWN_ARROW)) ballY += ballSpeed;
 
-  // ---- Draw the button ----
-  // We pass the button object to a helper function
-  drawGameButton(gameBtn);
+  // Keep the ball on the field
+  ballX = constrain(ballX, ballSize / 2, width - ballSize / 2);
+  ballY = constrain(ballY, ballSize / 2, height - ballSize / 2);
 
-  // ---- Cursor feedback ----
-  // If the mouse is over the button, show a hand cursor
-  // Otherwise, show the normal arrow cursor
-  cursor(isHover(gameBtn) ? HAND : ARROW);
+  // --- Draw the soccer ball (this is where you put it) ---
+  fill(255);
+  ellipse(ballX, ballY, ballSize);
+
+  // little center dot
+  fill(0);
+  ellipse(ballX, ballY, ballSize / 5);
+
+  // --- Optional: instructions for testing ---
+  fill(0);
+  textSize(16);
+  textAlign(CENTER);
+  text("Use arrow keys to move the ball", width / 2, 30);
 }
+
+// ---- Draw the button ----
+// We pass the button object to a helper function
+drawGameButton(gameBtn);
+
+// ---- Cursor feedback ----
+// If the mouse is over the button, show a hand cursor
+// Otherwise, show the normal arrow cursor
+cursor(isHover(gameBtn) ? HAND : ARROW);
 
 // ------------------------------
 // Button drawing helper
@@ -100,12 +128,7 @@ function gameMousePressed() {
 // Keyboard input for this screen
 // ------------------------------
 // Allows keyboard-only interaction (accessibility + design)
-function gameKeyPressed() {
-  // ENTER key triggers the same behaviour as clicking the button
-  if (keyCode === ENTER) {
-    triggerRandomOutcome();
-  }
-}
+function gameKeyPressed() {}
 
 // ------------------------------
 // Game logic: win or lose
