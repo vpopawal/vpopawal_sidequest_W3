@@ -1,18 +1,19 @@
 ## Project Title
 
-GBDA302 Week 3 Example 1: Instructions Screen with Back button
+GBDA302 Week 3 Sidequest: Kick It
 
 ---
 
 ## Authors
 
-Karen Cochrane and David Han
+Karen Cochrane, David Han, and Vrajani Popawala
 
 ---
 
 ## Description
 
-This p5.js project demonstrates a simple multi-screen game structure using a state-based approach. The example includes a start screen, an instructions screen with a back button, a basic game screen, and win/lose outcome screens. The focus is on showing how to separate screens into different files, route input based on the current game state, and design simple UI elements such as buttons and keyboard controls.
+
+This code game demostrates simple interative soccer a game with multi-screens. The game has home page where you can click between two buttons, the start button or the instrutions. When you click on etther it takes you to a different screen. The files show the different screen in the game. The game interactions are simple with only using the mouse and arrows and design is simple as well. The goal of the game is to get the ball in the net without getting hit by the mini soccer game.
 
 ---
 
@@ -35,5 +36,6 @@ N/A
 ## GenAI
 
 The code was written by Dr. Karen Cochrane but she used GenAI to write the comments.
+The soccer game code was written by GenAI.
 
 ---
