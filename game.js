@@ -17,9 +17,42 @@ let ballY;
 let ballSize = 30;
 let ballSpeed = 4;
 
+let goalWidth = 200;
+let goalHeight = 30;
+
+let obstacles = [];
+let obstacleSize = 20;
+let obstacleSpeed = 10;
+let obstacleSpawnRate = 20;
+
+let gameState = "playing";
+
+const playAgainBtn = {
+  x: 0,
+  y: 0,
+  w: 260,
+  h: 80,
+  label: "PLAY AGAIN",
+};
+
+const homeBtn = {
+  x: 0,
+  y: 0,
+  w: 260,
+  h: 80,
+  label: "RETURN HOME",
+};
+
 function initGame() {
   ballX = width / 2;
   ballY = height - 120;
+}
+
+function spawnObstacle() {
+  obstacles.push({
+    x: random(40, width - 40),
+    y: -20,
+  });
 }
 
 const gameBtn = {
@@ -35,50 +68,108 @@ const gameBtn = {
 // ------------------------------
 // drawGame() is called from main.js *only*
 // when currentScreen === "game"
+
 function drawGame() {
   // --- Soccer field background ---
   background(60, 160, 75);
 
-  // Midfield lines
+  // --- Goal ---
+  fill(255);
+  rectMode(CENTER);
+  rect(width / 2, goalHeight / 2, goalWidth, goalHeight);
+
+  // --- Field lines ---
   stroke(255);
   strokeWeight(6);
-  line(-10, height / 2, width + 10, height / 2); // horizontal
-  line(width / 2, -10, width / 2, height + 10); // vertical
+  line(-10, height / 2, width + 10, height / 2);
+  line(width / 2, -10, width / 2, height + 10);
   noStroke();
 
-  // --- Ball movement (player control) ---
+  // ===============================
+  // STOP GAME IF WON OR LOST
+  // ===============================
+  if (gameState !== "playing") {
+    drawEndScreen();
+    return;
+  }
+
+  // --- Ball movement ---
   if (keyIsDown(LEFT_ARROW)) ballX -= ballSpeed;
   if (keyIsDown(RIGHT_ARROW)) ballX += ballSpeed;
   if (keyIsDown(UP_ARROW)) ballY -= ballSpeed;
   if (keyIsDown(DOWN_ARROW)) ballY += ballSpeed;
 
-  // Keep the ball on the field
   ballX = constrain(ballX, ballSize / 2, width - ballSize / 2);
   ballY = constrain(ballY, ballSize / 2, height - ballSize / 2);
 
-  // --- Draw the soccer ball (this is where you put it) ---
+  // --- Draw ball ---
   fill(255);
   ellipse(ballX, ballY, ballSize);
-
-  // little center dot
   fill(0);
   ellipse(ballX, ballY, ballSize / 5);
 
-  // --- Optional: instructions for testing ---
-  fill(0);
-  textSize(16);
-  textAlign(CENTER);
-  text("Use arrow keys to move the ball", width / 2, 30);
+  // --- Obstacles ---
+  if (frameCount % obstacleSpawnRate === 0) {
+    spawnObstacle();
+  }
+
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+    obstacles[i].y += obstacleSpeed;
+
+    fill(255);
+    ellipse(obstacles[i].x, obstacles[i].y, obstacleSize);
+    fill(0);
+    ellipse(obstacles[i].x, obstacles[i].y, obstacleSize / 5);
+
+    // LOSE condition
+    let d = dist(ballX, ballY, obstacles[i].x, obstacles[i].y);
+    if (d < ballSize / 2 + obstacleSize / 2) {
+      gameState = "lose";
+    }
+
+    if (obstacles[i].y > height + 20) {
+      obstacles.splice(i, 1);
+    }
+  }
+
+  // ===============================
+  // WIN CONDITION (MUST BE LAST)
+  // ===============================
+  if (
+    ballY - ballSize / 2 <= goalHeight &&
+    ballX > width / 2 - goalWidth / 2 &&
+    ballX < width / 2 + goalWidth / 2
+  ) {
+    gameState = "win";
+  }
 }
+function drawEndScreen() {
+  // Dark overlay
+  fill(0, 180);
+  rectMode(CORNER);
+  rect(0, 0, width, height);
 
-// ---- Draw the button ----
-// We pass the button object to a helper function
-drawGameButton(gameBtn);
+  // Message
+  textAlign(CENTER, CENTER);
+  textSize(48);
+  fill(255);
 
-// ---- Cursor feedback ----
-// If the mouse is over the button, show a hand cursor
-// Otherwise, show the normal arrow cursor
-cursor(isHover(gameBtn) ? HAND : ARROW);
+  if (gameState === "win") {
+    text("YOU WON ⚽️", width / 2, height / 2 - 140);
+  } else {
+    text("YOU LOSE 💥", width / 2, height / 2 - 140);
+  }
+
+  // Button positions
+  playAgainBtn.x = width / 2;
+  playAgainBtn.y = height / 2;
+
+  homeBtn.x = width / 2;
+  homeBtn.y = height / 2 + 110;
+
+  drawButton(playAgainBtn);
+  drawButton(homeBtn);
+}
 
 // ------------------------------
 // Button drawing helper
@@ -110,6 +201,22 @@ function drawGameButton({ x, y, w, h, label }) {
   textSize(28);
   textAlign(CENTER, CENTER);
   text(label, x, y);
+
+  const playAgainBtn = {
+    x: width / 2,
+    y: height / 2,
+    w: 260,
+    h: 80,
+    label: "PLAY AGAIN",
+  };
+
+  const homeBtn = {
+    x: width / 2,
+    y: height / 2 + 110,
+    w: 260,
+    h: 80,
+    label: "RETURN HOME",
+  };
 }
 
 // ------------------------------
@@ -118,10 +225,24 @@ function drawGameButton({ x, y, w, h, label }) {
 // This function is called from main.js
 // only when currentScreen === "game"
 function gameMousePressed() {
-  // Only trigger the outcome if the button is clicked
-  if (isHover(gameBtn)) {
-    triggerRandomOutcome();
+  if (gameState === "playing") return;
+
+  if (isHover(playAgainBtn)) {
+    restartGame();
+    gameState = "playing";
   }
+
+  if (isHover(homeBtn)) {
+    restartGame();
+    gameState = "playing";
+    currentScreen = "start";
+  }
+}
+
+function restartGame() {
+  ballX = width / 2;
+  ballY = height - 120;
+  obstacles = [];
 }
 
 // ------------------------------
